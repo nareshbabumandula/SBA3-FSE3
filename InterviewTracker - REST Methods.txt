@@ -1,0 +1,40 @@
+mvn spring-boot:run
+
+localhost:9999/api/User/createUser
+
+{"userId":"naresh223","firstName":"Naresh Babu","lastName":"Mandula","mobileNo":"9502034567","email":"naresh@gmail.com"}
+
+localhost:9999/api/User/getAllUsers
+
+
+GET : localhost:9999/api/User/getAllUsers
+
+
+POST : localhost:9999/api/interview/create
+
+
+{"interviewid":"Ravi223",
+"interviewDate":"01-10-2020",
+"interviewStatus":"Cleared",
+"interviewTime":"01-01-2020 02:00:00",
+"interviewerName":"Naresh",
+"interviewName":"Java Full Stack",
+"remarks":"Selected",
+"userSkills":"Selenium"
+}
+
+localhost:9999/api/attendee/add
+
+
+{"userId":"1232","interviewId":"602272025445"}
+
+
+GET localhost:9999/api/attendee/getAllAttendees/602272025445
+
+
+GET localhost:9999/api/interview/search/Ajith
+
+GET localhost:9999/api/interview/getAllInterviews
+
+DELETE localhost:9999/api/interview/delete/602272940264
+
