@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,7 +68,7 @@ public class InterviewServiceImpl implements InterviewService {
 	@Override
 	public InterviewDTO findOne(String id) {
 		InterviewAssembler userAssembler = new InterviewAssembler();
-		return userAssembler.converToDto(interviewRepository.findOne(id));
+		return userAssembler.converToDto(interviewRepository.findById(id));
 	}
 
 	@Override
@@ -80,12 +81,12 @@ public class InterviewServiceImpl implements InterviewService {
 
 	@Override
 	public void delete(String id) {
-		Interview interView = interviewRepository.findOne(id);
+		Optional<Interview> interView = interviewRepository.findById(id);
 		if (interView == null) {
 			throw new ValidationException(new ValidationError("INTERVIEW_ID_NOT_FOUND", "Interview Not Found"));
 
 		}
-		interviewRepository.delete(id);
+		interviewRepository.deleteById(id);
 	}
 
 	@Override
@@ -95,28 +96,31 @@ public class InterviewServiceImpl implements InterviewService {
 			throw new ValidationException(new ValidationError("ID", "ID cannot be empty"));
 		}
 		// validateInterviewDTO(userDtls);
-		Interview interView = interviewRepository.findOne(userDtls.getInterviewId());
-		if (interView == null) {
+		Optional<Interview> interViewOptional = interviewRepository.findById(userDtls.getInterviewId());
+		if (interViewOptional.isPresent()) {
+			Interview interView = interViewOptional.get();
+			if (!StringUtils.isEmpty(userDtls.getInterviewerName())) {
+				interView.setInterviewerName(userDtls.getInterviewerName());
+			}
+			if (!StringUtils.isEmpty(userDtls.getInterviewStatus())) {
+				interView.setInterviewStatus(userDtls.getInterviewStatus());
+			}
+			if (!StringUtils.isEmpty(userDtls.getInterviewTime())) {
+				interView.setInterviewTime(parseStrToDateTime(userDtls.getInterviewTime()));
+			}
+			if (!StringUtils.isEmpty(userDtls.getInterviewName())) {
+				interView.setName(userDtls.getInterviewName());
+			}
+			if (!StringUtils.isEmpty(userDtls.getInterviewDate())) {
+				interView.setInterviewDate(parseStrToDate(userDtls.getInterviewDate()));
+			}
+		} else {
 			throw new ValidationException(new ValidationError("INTERVIEW_ID_NOT_FOUND", "Interview Not Found"));
+		}
 
-		}
-		if (!StringUtils.isEmpty(userDtls.getInterviewerName())) {
-			interView.setInterviewerName(userDtls.getInterviewerName());
-		}
-		if (!StringUtils.isEmpty(userDtls.getInterviewStatus())) {
-			interView.setInterviewStatus(userDtls.getInterviewStatus());
-		}
-		if (!StringUtils.isEmpty(userDtls.getInterviewTime())) {
-			interView.setInterviewTime(parseStrToDateTime(userDtls.getInterviewTime()));
-		}
-		if (!StringUtils.isEmpty(userDtls.getInterviewName())) {
-			interView.setName(userDtls.getInterviewName());
-		}
-		if (!StringUtils.isEmpty(userDtls.getInterviewDate())) {
-			interView.setInterviewDate(parseStrToDate(userDtls.getInterviewDate()));
-		}
 		interviewRepository.save(userAssembler.converToEntity(userDtls));
 	}
+
 	private LocalDate parseStrToDate(String dte) {
 		if (dte != null) {
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
@@ -134,40 +138,45 @@ public class InterviewServiceImpl implements InterviewService {
 		}
 		return null;
 	}
+
 	private void validateInterviewDTO(InterviewDTO dto) {
 		Assert.notNull(dto, "InterviewDTO must not be null!");
-		
+
 		if (StringUtils.isEmpty(dto.getInterviewerName())) {
 			throw new ValidationException(new ValidationError("INTERVIEWER_NAME", "Interviewer Name cannot be empty"));
+		} else if (!(dto.getInterviewerName().length() >= 5 && dto.getInterviewerName().length() < 30)) {
+			throw new ValidationException(new ValidationError("INTERVIEWER_NAME_MIN_MAX",
+					"Interviewer name should be minimum 5 and maximum 30 characters"));
 		}
-		else if(!(dto.getInterviewerName().length()>=5 && dto.getInterviewerName().length()<30)) {
-			throw new ValidationException(new ValidationError("INTERVIEWER_NAME_MIN_MAX", "Interviewer name should be minimum 5 and maximum 30 characters"));
-		}
-		
+
 		if (StringUtils.isEmpty(dto.getInterviewName())) {
 			throw new ValidationException(new ValidationError("INTERVIEW NAME", "Interview name cannot be empty"));
-		}else if(!(dto.getInterviewName().length()>=3 && dto.getInterviewName().length()<30)) {
-			throw new ValidationException(new ValidationError("INTERVIEW NAME_MIN_MAX", "Interview name should be minimum 5 and maximum 100 characters"));
+		} else if (!(dto.getInterviewName().length() >= 3 && dto.getInterviewName().length() < 30)) {
+			throw new ValidationException(new ValidationError("INTERVIEW NAME_MIN_MAX",
+					"Interview name should be minimum 5 and maximum 100 characters"));
 		}
-		
+
 		if (StringUtils.isEmpty(dto.getUserSkills())) {
 			throw new ValidationException(new ValidationError("USER SKILLS", "User Skills cannot be empty"));
-		}else if(!(dto.getUserSkills().length()>=5 && dto.getUserSkills().length()<30)) {
-			throw new ValidationException(new ValidationError("USER SKILLS_MIN_MAX", "User skills should be minimum 5 and maximum 30 characters"));
+		} else if (!(dto.getUserSkills().length() >= 5 && dto.getUserSkills().length() < 30)) {
+			throw new ValidationException(new ValidationError("USER SKILLS_MIN_MAX",
+					"User skills should be minimum 5 and maximum 30 characters"));
 		}
-		
+
 		if (StringUtils.isEmpty(dto.getInterviewStatus())) {
 			throw new ValidationException(new ValidationError("INTERVIEW STATUS", "Interview status cannot be empty"));
-		}else if(!(dto.getInterviewStatus().length()>=5 && dto.getInterviewStatus().length()<100)) {
-			throw new ValidationException(new ValidationError("INTERVIEW STATUS_MIN_MAX", "Interview status should be minimum 5 and maximum 100 characters"));
+		} else if (!(dto.getInterviewStatus().length() >= 5 && dto.getInterviewStatus().length() < 100)) {
+			throw new ValidationException(new ValidationError("INTERVIEW STATUS_MIN_MAX",
+					"Interview status should be minimum 5 and maximum 100 characters"));
 		}
-		
+
 		if (StringUtils.isEmpty(dto.getRemarks())) {
 			throw new ValidationException(new ValidationError("REMARKS", "Remarks cannot be empty"));
-		}else if(!(dto.getRemarks().length()>=5 && dto.getRemarks().length()<100)) {
-			throw new ValidationException(new ValidationError("REMARKS_MIN_MAX", "Remarks should be minimum 5 and maximum 100 characters"));
+		} else if (!(dto.getRemarks().length() >= 5 && dto.getRemarks().length() < 100)) {
+			throw new ValidationException(
+					new ValidationError("REMARKS_MIN_MAX", "Remarks should be minimum 5 and maximum 100 characters"));
 		}
-		
+
 		if (StringUtils.isEmpty(dto.getInterviewerName()))
 			throw new ValidationException(new ValidationError("INTERVIEWER_NAME", "Interviewer Name cannot be empty"));
 		if (StringUtils.isEmpty(dto.getInterviewName()))
@@ -183,18 +192,19 @@ public class InterviewServiceImpl implements InterviewService {
 	@Override
 	public void addAttendee(AttendeeDTO userDtls) {
 
-		Interview interView = interviewRepository.findOne(userDtls.getInterviewId());
-		if (interView == null) {
+		Optional<Interview> interViewOptional = interviewRepository.findById(userDtls.getInterviewId());
+		if (!interViewOptional.isPresent()) {
 			throw new ValidationException(new ValidationError("INTERVIEW_ID_NOT_FOUND", "Interview Not Found"));
 
 		}
-		User user = userRepository.findOne(userDtls.getUserId());
-		if (user == null) {
+		Optional<User> userOptional = userRepository.findById(userDtls.getUserId());
+		if (!userOptional.isPresent()) {
 			throw new ValidationException(new ValidationError("USER_ID_NOT_FOUND", "User Not Found"));
 
 		}
 		java.util.Set<User> set = new HashSet<User>();
-		set.add(user);
+		set.add(userOptional.get());
+		Interview interView = interViewOptional.get();
 		interView.setAttendees(set);
 		interviewRepository.save(interView);
 	}
@@ -202,11 +212,11 @@ public class InterviewServiceImpl implements InterviewService {
 	@Override
 	public AttendeeResponse getAllAttendee(String userDtls) {
 		// TODO Auto-generated method stub
-		Interview interView = interviewRepository.findOne(userDtls);
-		if (interView == null) {
+		Optional<Interview> interViewOptional = interviewRepository.findById(userDtls);
+		if (!interViewOptional.isPresent()) {
 			throw new ValidationException(new ValidationError("ATTENDEES_NOT_AVAL", "Attendees are not found"));
-
 		}
+		Interview interView = interViewOptional.get();
 		UserAssembler assembler = new UserAssembler();
 		AttendeeResponse resp = new AttendeeResponse();
 		List<User> listUser = convertSetToList(interView.getAttendees());

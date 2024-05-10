@@ -3,59 +3,59 @@ package com.interviewtracker.model;
 import java.io.Serializable;
 
 public class UserDTO implements Serializable{
-	
+
 	private String userId;
 
-    private String firstName;
+	private String firstName;
 
-    private String lastName;
+	private String lastName;
 
-    private String email;
+	private String email;
 
-    private String mobileNo;
+	private String mobileNo;
 
-		
 
-		public String getUserId() {
-			return userId;
-		}
 
-		public void setUserId(String userId) {
-			this.userId = userId;
-		}
+	public String getUserId() {
+		return userId;
+	}
 
-		public String getFirstName() {
-			return firstName;
-		}
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
 
-		public void setFirstName(String firstName) {
-			this.firstName = firstName;
-		}
+	public String getFirstName() {
+		return firstName;
+	}
 
-		public String getLastName() {
-			return lastName;
-		}
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
 
-		public void setLastName(String lastName) {
-			this.lastName = lastName;
-		}
+	public String getLastName() {
+		return lastName;
+	}
 
-		public String getEmail() {
-			return email;
-		}
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
 
-		public void setEmail(String email) {
-			this.email = email;
-		}
+	public String getEmail() {
+		return email;
+	}
 
-		public String getMobileNo() {
-			return mobileNo;
-		}
+	public void setEmail(String email) {
+		this.email = email;
+	}
 
-		public void setMobileNo(String mobileNo) {
-			this.mobileNo = mobileNo;
-		}
-	    
-	    
+	public String getMobileNo() {
+		return mobileNo;
+	}
+
+	public void setMobileNo(String mobileNo) {
+		this.mobileNo = mobileNo;
+	}
+
+
 
 }

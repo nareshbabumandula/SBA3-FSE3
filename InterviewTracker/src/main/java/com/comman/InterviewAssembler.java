@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.interviewtracker.model.Interview;
@@ -12,17 +13,18 @@ import com.interviewtracker.model.InterviewDTO;
 
 public class InterviewAssembler {
 
-	public InterviewDTO converToDto(Interview user) {
-		if (user != null) {
+	public InterviewDTO converToDto(Optional<Interview> interviewOptional) {
+		if (interviewOptional.isPresent()) {
+			Interview interview = interviewOptional.get();
 			InterviewDTO dto = new InterviewDTO();
-			dto.setInterviewDate(parseDateToStr(user.getInterviewDate()));
-			dto.setInterviewerName(user.getInterviewerName());
-			dto.setInterviewId(user.getInterviewId());
-			dto.setInterviewStatus(user.getInterviewStatus());
-			dto.setInterviewTime(parseDateTimeToStr(user.getInterviewTime()));
-			dto.setInterviewName(user.getName());
-			dto.setRemarks(user.getRemarks());
-			dto.setUserSkills(user.getUserSkills());
+			dto.setInterviewDate(parseDateToStr(interview.getInterviewDate()));
+			dto.setInterviewerName(interview.getInterviewerName());
+			dto.setInterviewId(interview.getInterviewId());
+			dto.setInterviewStatus(interview.getInterviewStatus());
+			dto.setInterviewTime(parseDateTimeToStr(interview.getInterviewTime()));
+			dto.setInterviewName(interview.getName());
+			dto.setRemarks(interview.getRemarks());
+			dto.setUserSkills(interview.getUserSkills());
 			return dto;
 		}
 		return null;
@@ -46,7 +48,7 @@ public class InterviewAssembler {
 
 	public List<InterviewDTO> converToListDto(List<Interview> user) {
 		if (user != null)
-			return user.parallelStream().map(this::converToDto).collect(Collectors.toList());
+			return user.parallelStream().map(a->this.converToDto(Optional.of(a))).collect(Collectors.toList());
 
 		return new ArrayList<InterviewDTO>();
 	}

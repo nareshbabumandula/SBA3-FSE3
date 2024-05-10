@@ -2,6 +2,7 @@ package com.comman;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.interviewtracker.model.User;
@@ -9,8 +10,9 @@ import com.interviewtracker.model.UserDTO;
 
 public class UserAssembler {
 
-	public UserDTO converToDto(User user) {
-		if(user!=null) {
+	public UserDTO converToDto(Optional<User> userOptional) {
+		if(userOptional.isPresent()) {
+			User user = userOptional.get();
 			UserDTO dto=new UserDTO();
 			dto.setEmail(user.getEmail());
 			dto.setUserId(user.getUserId());
@@ -38,7 +40,7 @@ public class UserAssembler {
 	public List<UserDTO>  converToListDto(List<User> user){
 		if(user!=null)
 			return user.parallelStream().
-					            map(this::converToDto).collect(Collectors.toList());
+					            map(a->this.converToDto(Optional.of(a))).collect(Collectors.toList());
 			
 			return new ArrayList<UserDTO>();
 	}

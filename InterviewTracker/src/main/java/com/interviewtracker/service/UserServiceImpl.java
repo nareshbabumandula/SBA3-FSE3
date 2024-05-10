@@ -2,6 +2,7 @@ package com.interviewtracker.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -48,14 +49,14 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public UserDTO findOne(String id) {
 		UserAssembler userAssembler = new UserAssembler();
-		return userAssembler.converToDto(userRepository.findOne(id));
+		return userAssembler.converToDto(userRepository.findById(id));
 	}
 
 	@Override
 	public void save(UserDTO contact) {
 		validateUserDTO(contact);
 		UserAssembler userAssembler = new UserAssembler();
-		User user = userRepository.findOne(contact.getUserId());
+		Optional<User> user = userRepository.findById(contact.getUserId());
 		if (user != null) {
 			throw new ValidationException(new ValidationError("USER_ID_ALREADY_EXISTS", "User ID Already Exists"));
 
@@ -65,12 +66,12 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public void delete(String id) {
-		User user = userRepository.findOne(id);
+		Optional<User> user = userRepository.findById(id);
 		if (user == null) {
 			throw new ValidationException(new ValidationError("USER_NOT_FOUND", "User Not Found"));
 
 		}
-		userRepository.delete(id);
+		userRepository.deleteById(id);
 	}
 
 	@Override
